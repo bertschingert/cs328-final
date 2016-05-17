@@ -1,0 +1,4 @@
+*.doc
+*.docx
+tmp*
+audio_files/
