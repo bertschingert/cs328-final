@@ -1,5 +1,6 @@
 *.doc
 *.docx
 tmp*
+*cache*
 ._.DS_Store
 audio_files/
