@@ -5,26 +5,14 @@
 import math
 import numpy.fft as fft
 import matplotlib.pyplot as plt
+import audio_utils
 
 SR = 44100
 SP = 1 / SR
 
 # dur in seconds
 # amp between 0 and 1
-def create_sine_wave(freq, amp, dur):
-    dur *= SR
-    wave = []
-    for i in range(dur):
-        wave.append(amp * math.sin(i*freq*2*math.pi*SP))
-    return wave
 
-def create_saw_wave(freq, amp, dur):
-    dur *= SR
-    period = SR / freq
-    wave = []
-    for i in range(dur):
-        wave.append((i%period) / period)
-    return wave
 
 def read_raw_stereo(filename):
     raw_file = open(filename)
