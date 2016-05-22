@@ -4,7 +4,6 @@
 
 import math
 import numpy.fft as fft
-import matplotlib.pyplot as plt
 import audio_utils
 
 SR = 44100
@@ -46,29 +45,63 @@ def get_attack_time(signal, f_s):
         end = start + step
     return 0
 
-def graph_fft(spectrum):
+def get_spectral_centroid(spectrum, f_s):
     """
-    * plots the spectrum, which should
-    * be the output of an FFT
+    * computes the spectral centroid
+    * which is the weighted mean of the spectrum
+    * spectrum : the output of the FFT of a signal
+    * f_s : sample rate
     """
-    length = len(spectrum)
-    plt.plot(range(length), spectrum)
-    plt.xlabel('frequency')
-    plt.ylabel('amplitude')
-    plt.title('Spectrum')
-    plt.show()
+    l = len(spectrum)
+    centroid = 0
+    d = 0
+    for i in range(l):
+        f = (i * f_s) / (2 * l) # the freqency of the ith bin
+        x = abs(spectrum[i])
+        centroid += f * x
+        d += x
+    centroid = centroid / d
+    return centroid
+
+def hann_window(signal):
+    """
+    * the Hann window tapers the beginning and end
+    * of a signal
+    * this reduces noise when applying the FFT
+    """
+    windowed_signal = []
+    N = len(signal)
+    for i in range(N):
+        val = 1 - math.cos( (2 * math.pi * i) / (N - 1) )
+        val *= 0.5
+        windowed_signal.append(val * signal[i])
+    return windowed_signal
 
 def main():
     left, right = audio_utils.read_raw_stereo("audio_files/violin-a440.raw")
 
     chunk = left[:44100]
     freqs = fft.rfft(chunk)
-    """
+
     for i in range(len(freqs)):
         print("bin ", i * SR / len(chunk), " : ", end = "")
         print(abs(freqs[i]))
-    """
+
     get_attack_time(left, SR)
+    print(get_spectral_centroid(freqs, SR))
+
+    """
+    wave = audio_utils.create_sine_wave(440, 1, 1)
+    spectrum = fft.rfft(wave[:44100])
+    print(get_spectral_centroid(spectrum, SR))
+
+    test_signal = []
+    for i in range(100):
+        test_signal.append(1)
+    w = hann_window(test_signal)
+    for i in w:
+        print(i)
+    """
 
 
 if __name__ == '__main__':

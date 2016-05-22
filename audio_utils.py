@@ -1,11 +1,35 @@
 # Thomas Bertschinger and Sanders McMillan
+# CS 328 Final Project
+# audio_utils.py
 # This file has useful audio code
+
+import math
+import matplotlib.pyplot as plt
 
 SR = 44100
 SP = 1 / SR
 
-# dur in seconds
-# amp between 0 and 1
+def graph_fft(spectrum):
+    """
+    * plots the spectrum, which should
+    * be the output of an FFT
+    """
+    length = len(spectrum)
+    plt.plot(range(length), spectrum)
+    plt.xlabel('frequency')
+    plt.ylabel('amplitude')
+    plt.title('Spectrum')
+    plt.show()
+
+def graph_signal(signal):
+    """
+    * plots the signal
+    """
+    length = len(signal)
+    plt.plot(range(length), signal)
+    plt.xlabel('time')
+    plt.title('Signal')
+    plt.show()
 
 def read_raw_stereo(filename):
     raw_file = open(filename)
@@ -27,6 +51,7 @@ def create_sine_wave(freq, amp, dur):
         wave.append(amp * math.sin(i*freq*2*math.pi*SP))
     return wave
 
+# this function is currently NON-FUNCTIONAL
 def create_saw_wave(freq, amp, dur):
     dur *= SR
     period = SR / freq
