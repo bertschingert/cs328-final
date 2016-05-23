@@ -3,8 +3,10 @@
 # audio-processing.py
 
 import math
+import wave
+import struct
 import numpy.fft as fft
-import audio_utils
+import audio_utils as au
 
 SR = 44100
 SP = 1 / SR
@@ -78,30 +80,13 @@ def hann_window(signal):
     return windowed_signal
 
 def main():
-    left, right = audio_utils.read_raw_stereo("audio_files/violin-a440.raw")
-
-    chunk = left[:44100]
-    freqs = fft.rfft(chunk)
-
-    for i in range(len(freqs)):
-        print("bin ", i * SR / len(chunk), " : ", end = "")
-        print(abs(freqs[i]))
-
-    get_attack_time(left, SR)
-    print(get_spectral_centroid(freqs, SR))
-
-    """
-    wave = audio_utils.create_sine_wave(440, 1, 1)
-    spectrum = fft.rfft(wave[:44100])
-    print(get_spectral_centroid(spectrum, SR))
-
-    test_signal = []
-    for i in range(100):
-        test_signal.append(1)
-    w = hann_window(test_signal)
-    for i in w:
-        print(i)
-    """
+    f = au.read_wav_mono('audio_files/trumpet_A3_15_pianissimo_normal.wav')
+    print(len(f))
+    m = 0
+    for i in f:
+        if i < m:
+            m = i
+    print(m)
 
 
 if __name__ == '__main__':

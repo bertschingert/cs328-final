@@ -4,6 +4,8 @@
 # This file has useful audio code
 
 import math
+import wave
+import struct
 import matplotlib.pyplot as plt
 
 SR = 44100
@@ -28,8 +30,29 @@ def graph_signal(signal):
     length = len(signal)
     plt.plot(range(length), signal)
     plt.xlabel('time')
+    plt.ylable('amplitude')
     plt.title('Signal')
     plt.show()
+
+def read_wav_mono(filename):
+    """
+    * returns a LIST of samples
+    * each sample is a (signed 16-bit) integer
+    """
+    f = wave.open(filename, 'r')
+    if f.getnchannels() != 1:
+        print("Error: this is not mono")
+        return
+    out = []
+    for i in range(f.getnframes()):
+        # readframes returns a byte string
+        # this is interpreted by the struct.unpack method
+        # "<h" means a little-endian signed 16-bit integer
+        # which is the format of our wav files
+        val = struct.unpack("<h", f.readframes(1))[0]
+        out.append(val)
+    return out
+
 
 def read_raw_stereo(filename):
     raw_file = open(filename)
