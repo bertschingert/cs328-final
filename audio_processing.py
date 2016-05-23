@@ -5,6 +5,7 @@
 import math
 import numpy.fft as fft
 import audio_utils
+import numpy as np
 
 SR = 44100
 SP = 1 / SR
@@ -63,6 +64,29 @@ def get_spectral_centroid(spectrum, f_s):
     centroid = centroid / d
     return centroid
 
+def get_spectral_flux(signal, f_s):
+    l = len(signal)
+    if l < (f_s / 2):
+        print("Warning: very short signal")
+    # divide the signal up into chunks
+    step = int(f_s / 16)
+    start = 0
+    end = start + step
+    old_spectrum = [0] * (int(step / 2) + 1)
+    spectralFlux = []
+    while end < l:
+        chunk = signal[start:end]
+        new_spectrum = fft.rfft(chunk)
+        spectralFlux.append(get_vector_distance(old_spectrum, new_spectrum))
+        old_spectrum = list(new_spectrum)
+        # print( "Old: ", id(old_spectrum), "New: ", id(new_spectrum) )
+        start = end
+        end = start + step
+    return spectralFlux
+
+def get_spectral_mean(signal):
+    return np.sum(np.absolute(signal))/len(signal)
+                     
 def hann_window(signal):
     """
     * the Hann window tapers the beginning and end
