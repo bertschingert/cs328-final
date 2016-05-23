@@ -8,16 +8,31 @@ import wave
 import struct
 import matplotlib.pyplot as plt
 
-SR = 44100
-SP = 1 / SR
+SR = 44100      # sapmle rate (assumed to be 44100 always)
+SP = 1 / SR     # sample period
 
-def graph_fft(spectrum):
+def graph_fft(spectrum, f):
     """
     * plots the spectrum, which should
     * be the output of an FFT
+    * spectrum : must be COMPLETE spectrum
+    *            in order to get accurate bin info
+    * f : graph stops at this frequency
     """
+    real_spectrum = []
+    for s in spectrum:
+        real_spectrum.append(abs(s))
     length = len(spectrum)
-    plt.plot(range(length), spectrum)
+
+    bins = []
+    n = 0
+    for i in range(length):
+        val = i * SR / (2 * length)
+        if val > f and n == 0:
+            n = i
+        bins.append( val )
+
+    plt.plot(bins[:n], real_spectrum[:n])
     plt.xlabel('frequency')
     plt.ylabel('amplitude')
     plt.title('Spectrum')
@@ -30,7 +45,7 @@ def graph_signal(signal):
     length = len(signal)
     plt.plot(range(length), signal)
     plt.xlabel('time')
-    plt.ylable('amplitude')
+    plt.ylabel('amplitude')
     plt.title('Signal')
     plt.show()
 
@@ -49,7 +64,7 @@ def read_wav_mono(filename):
         # this is interpreted by the struct.unpack method
         # "<h" means a little-endian signed 16-bit integer
         # which is the format of our wav files
-        val = struct.unpack("<h", f.readframes(1))
+        val = struct.unpack("<h", f.readframes(1))[0]
         out.append(val)
     return out
 

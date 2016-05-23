@@ -12,18 +12,18 @@ import numpy as np
 SR = 44100
 SP = 1 / SR
 
-# returns the "Hamming" distance of two vectors
-def get_vector_distance(a, b):
+
+def euclidean_distance(a, b):
     d = 0
     if len(a) != len(b):
         print("Warning: vectors are of different sizes")
     l = min(len(a), len(b))
     for i in range(l):
-        d += abs(a[i] - b[i])
-    return d
+        d += ( abs(a[i]) - abs(b[i]) )**2
+    return math.sqrt(d)
 
 # THIS FUNCTION IS IN ROUGH DRAFT MODE RIGHT NOW
-def get_attack_time(signal, f_s):
+def attack_time(signal, f_s):
     """
     * ostensibly returns the attack time in milliseconds
     * signal : a vector with the samples
@@ -48,7 +48,7 @@ def get_attack_time(signal, f_s):
         end = start + step
     return 0
 
-def get_spectral_centroid(spectrum, f_s):
+def spectral_centroid(spectrum, f_s):
     """
     * computes the spectral centroid
     * which is the weighted mean of the spectrum
@@ -66,12 +66,12 @@ def get_spectral_centroid(spectrum, f_s):
     centroid = centroid / d
     return centroid
 
-def get_spectral_flux(signal, f_s):
+def spectral_flux(signal):
     l = len(signal)
-    if l < (f_s / 2):
+    if l < (SR / 2):
         print("Warning: very short signal")
     # divide the signal up into chunks
-    step = int(f_s / 16)
+    step = int(SR / 16)
     start = 0
     end = start + step
     old_spectrum = [0] * (int(step / 2) + 1)
@@ -79,14 +79,14 @@ def get_spectral_flux(signal, f_s):
     while end < l:
         chunk = signal[start:end]
         new_spectrum = fft.rfft(chunk)
-        spectralFlux.append(get_vector_distance(old_spectrum, new_spectrum))
+        spectralFlux.append(euclidean_distance(old_spectrum, new_spectrum))
         old_spectrum = list(new_spectrum)
         # print( "Old: ", id(old_spectrum), "New: ", id(new_spectrum) )
         start = end
         end = start + step
     return spectralFlux
 
-def get_spectral_mean(signal):
+def spectral_mean(signal):
     return np.sum(np.absolute(signal))/len(signal)
 
 def hann_window(signal):
@@ -104,10 +104,9 @@ def hann_window(signal):
     return windowed_signal
 
 def main():
-    f = au.read_wav_mono('audio_files/trumpet_A3_15_pianissimo_normal.wav')
-    for i in f[:15]:
-        print(i)
-
+    f = au.read_wav_mono('audio_files/guitar_A4_very-long_forte_normal.wav')
+    s = spectral_flux(f)
+    print(s)
 
 if __name__ == '__main__':
     main()
