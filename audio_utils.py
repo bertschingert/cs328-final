@@ -49,7 +49,7 @@ def read_wav_mono(filename):
         # this is interpreted by the struct.unpack method
         # "<h" means a little-endian signed 16-bit integer
         # which is the format of our wav files
-        val = struct.unpack("<h", f.readframes(1))[0]
+        val = struct.unpack("<h", f.readframes(1))
         out.append(val)
     return out
 

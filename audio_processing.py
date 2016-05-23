@@ -105,12 +105,8 @@ def hann_window(signal):
 
 def main():
     f = au.read_wav_mono('audio_files/trumpet_A3_15_pianissimo_normal.wav')
-    print(len(f))
-    m = 0
-    for i in f:
-        if i < m:
-            m = i
-    print(m)
+    for i in f[:15]:
+        print(i)
 
 
 if __name__ == '__main__':
