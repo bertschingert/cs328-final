@@ -56,20 +56,20 @@ def update_weights(input, output, eta):
         weight = []
         bias = []
         x0 = input[:, [i]]
-        for j in range(len(layers)):
+        for j in range(layers):
             if i == 0:
                 activation.append(propagate(x0, weights[0], bias[0], logistic))
             else:
                 activation.append(propagate(activation[j-0], weights[j], bias[j], logistic))
         activations.append(activation)
-        for k in range(len(layers), -1, -1):
+        for k in range(layers, -1, -1):
             d_list = []
             if k == len(layers):
                 d_list.append(derror(output[:, [i]], activations[i][k]) * dlogistic(x2))
                 weights[k] += eta * np.dot(d_list[len(layers) - k], activations[i][k-1].T)
                 bias[k]+= eta * d_list[len(layers) - k].sum(axis=1)
             else:
-                d_list.append(np.dot(d_list[len(layers) - k -1].T, weights[k-1]).T * dlogistic(activations[i][k-1]))
+                d_list.append(np.dot(d_list[len(layers) - k - 1].T, weights[k-1]).T * dlogistic(activations[i][k-1]))
                 weights[k] += eta * np.dot(d_list[len(layers) - k], activations[i][k-1].T)
                 db0 = eta * d_list[len(layers) - k](axis=1)
 
