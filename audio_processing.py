@@ -12,7 +12,6 @@ import numpy as np
 SR = 44100
 SP = 1 / SR
 
-
 def euclidean_distance(a, b):
     d = 0
     if len(a) != len(b):
