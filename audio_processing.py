@@ -47,7 +47,42 @@ def attack_time(signal, f_s):
         end = start + step
     return 0
 
-def spectral_centroid(spectrum, f_s):
+def trim_silence(signal):
+    """
+    * trims leading and trailing silence from the signal
+    * to make further processing easier
+    """
+    signal_begin = -1    # will be first relevant sample
+    signal_end = -1      # will be last relevant sample
+
+    l = len(signal)
+    step = int(SR / 200) # consider 50 ms chunks
+    start = 0
+    end = start + step
+    centroids = []
+    while end < l:
+        chunk = signal[start:end]
+        spectrum = fft.rfft(chunk)
+        c = spectral_centroid(spectrum)
+        centroids.append(c)
+        if c > 200 and signal_begin < 0:
+            signal_begin = start
+        if c < 200 and signal_begin >= 0:
+            signal_end = end
+
+        start = end
+        end = start + step
+    print(signal_begin, signal_end)
+    return (signal[ signal_begin : signal_end ], centroids)
+
+def fundamental(signal):
+    s = fft.rfft(signal)
+    m = np.argmax(s)
+    f = m * SR / (2 * len(s))
+    return f
+
+
+def spectral_centroid(spectrum):
     """
     * computes the spectral centroid
     * which is the weighted mean of the spectrum
@@ -58,10 +93,12 @@ def spectral_centroid(spectrum, f_s):
     centroid = 0
     d = 0
     for i in range(l):
-        f = (i * f_s) / (2 * l) # the freqency of the ith bin
+        f = (i * SR) / (2 * l) # the freqency of the ith bin
         x = abs(spectrum[i])
         centroid += f * x
         d += x
+    if d == 0:
+        return 0
     centroid = centroid / d
     return centroid
 

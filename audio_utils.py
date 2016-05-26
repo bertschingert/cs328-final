@@ -22,7 +22,7 @@ def graph_fft(spectrum, f):
     real_spectrum = []
     for s in spectrum:
         real_spectrum.append(abs(s))
-    length = len(spectrum)
+    length = len(real_spectrum)
 
     bins = []
     n = 0
