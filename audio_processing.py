@@ -122,6 +122,11 @@ def spectral_flux(signal):
         end = start + step
     return spectralFlux
 
+def cepstrum(signal):
+    spectrum = fft.rfft(signal)
+    cepstrum = np.fft.ifft(np.log(np.abs(spectrum))).real
+    return cepstrum
+
 def spectral_mean(signal):
     return np.sum(np.absolute(signal))/len(signal)
 

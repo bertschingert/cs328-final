@@ -32,19 +32,29 @@ def graph_fft(spectrum, f):
             n = i
         bins.append( val )
 
-    plt.plot(bins[:n], real_spectrum[:n])
+    fig = plt.plot(bins[:n], real_spectrum[:n])
     plt.xlabel('frequency')
     plt.ylabel('amplitude')
     plt.title('Spectrum')
     plt.show()
 
-def graph_signal(signal):
+def graph_signal(signal, rate = 44100):
     """
     * plots the signal
+    * rate is how many samples per second
     """
     length = len(signal)
+
+    t_locs = []
+    t_names = []
+    s = int(length / rate)
+    for i in range(s + 1):
+        t_locs.append(rate * i)
+        t_names.append(str(i))
+
     plt.plot(range(length), signal)
     plt.xlabel('time')
+    plt.xticks(t_locs, t_names)
     plt.ylabel('amplitude')
     plt.title('Signal')
     plt.show()
