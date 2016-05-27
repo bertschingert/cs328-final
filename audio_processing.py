@@ -77,34 +77,28 @@ def trim_silence(signal):
 
 def fundamental(signal):
     s = fft.rfft(signal)
+    """
+    N = len(s)
+    print("number of bins:", N)
+
+    hz = 1000
+    step = int (2 * hz * N / SR)
+    start = 0
+    end = start + step
+
+    while end < N:
+        m = np.argmax(s[start:end]) + start
+        f = m * SR / (2 * N)
+        print(f)
+        start = end
+        end += step
+    """
     m = np.argmax(s)
     f = m * SR / (2 * len(s))
     return f
 
 def harmonic_representation(signal):
     harmonics = []
-    # N = len(signal)
-
-    # print(fund)
-
-    """
-    flux = spectral_flux(signal)
-    m_indx = np.argmax(flux)
-    print(m_indx)
-    # find a good "chunk" to work on
-
-    test = 0
-    for i in range(m_indx, len(flux) - m_indx):
-        if flux[i] < flux[m_indx] / 5:
-            test += 1
-            # print(i, " has ", flux[i])
-            if test == 16:  # find a 1-second long portion
-                break       # with little flux
-    # print("start at:", i - 16 + 1)
-
-    start = int(i * SR / 16)
-    end = int(start + SR / 4)
-    """
 
     fund = fundamental(signal)
     num_harmonics = min(8, int( 22050 / fund) )
@@ -118,12 +112,14 @@ def harmonic_representation(signal):
     L = len(spectrum)
 
     f = fundamental( signal[start : end] )
+    print(fund, f)
 
     # f_indx = int( (f * 2 * L) / SR )
     # harmonics.append( abs(spectrum[f_indx]) )
 
     for i in range(1, num_harmonics + 1):
         f_indx = int( f * i * 2 * L / SR)
+        print("now on ", f_indx)
 
         r = abs( spectrum[f_indx] )
         for j in range(f_indx - 10, f_indx + 20):
@@ -136,9 +132,7 @@ def harmonic_representation(signal):
     for i in range(len(harmonics)):
         harmonics[i] = harmonics[i] / t
 
-
     return harmonics
-
 
 def spectral_centroid(spectrum):
     """
@@ -203,20 +197,12 @@ def hann_window(signal):
     return windowed_signal
 
 def main():
-    print("guitar")
-    f = au.read_wav_mono('audio_files/guitar/guitar_A4_very-long_forte_normal.wav')
+
+    f = au.read_wav_mono('audio_files/saxophone/saxophone_A5_15_fortissimo_normal.wav')
+
     h = harmonic_representation(f)
     print(np.array(h))
 
-    print("saxophone")
-    f = au.read_wav_mono('audio_files/saxophone/saxophone_A4_15_forte_normal.wav')
-    h = harmonic_representation(f)
-    print(np.array(h))
-
-    print("violin")
-    f = au.read_wav_mono('audio_files/violin/violin_A4_1_mezzo-piano_arco-normal.wav')
-    h = harmonic_representation(f)
-    print(np.array(h))
 
 if __name__ == '__main__':
     main()

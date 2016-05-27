@@ -3,6 +3,7 @@
 # representation.py
 
 import audio_utils as au
+import audio_processing as ap
 
 def load_audio_files():
     filenames = open('filenames.txt', 'r')
@@ -24,11 +25,24 @@ def load_audio_files():
             violins.append(wave)
     return (guitars, violins, saxophones)
 
+def get_harmonic_representations():
+    filenames = open('filenames.txt', 'r')
+    for line in filenames:
+        if 'guitar' in line:
+            print("guitar", end=' ')
+        if 'saxophone' in line:
+            print("saxophone", end=' ')
+        if 'violin' in line:
+            print("violin", end=' ')
+
+        s = au.read_wav_mono(line.strip())
+        h = ap.harmonic_representation(s)
+        for i in h:
+            print(i, end = ' ')
+        print(' ')
+
 def main():
-    t = load_audio_files()
-    print("guitars: ", len(t[0]))
-    print("saxophones: ", len(t[1]))
-    print("violins: ", len(t[2]))
+    get_harmonic_representations()
 
 if __name__ == '__main__':
     main()
