@@ -47,6 +47,7 @@ def attack_time(signal, f_s):
         end = start + step
     return 0
 
+# THIS FUNCTION IS IN ROUGH DRAFT MODE RIGHT NOW
 def trim_silence(signal):
     """
     * trims leading and trailing silence from the signal
@@ -72,7 +73,6 @@ def trim_silence(signal):
 
         start = end
         end = start + step
-    print(signal_begin, signal_end)
     return (signal[ signal_begin : signal_end ], centroids)
 
 def fundamental(signal):
@@ -80,6 +80,64 @@ def fundamental(signal):
     m = np.argmax(s)
     f = m * SR / (2 * len(s))
     return f
+
+def harmonic_representation(signal):
+    harmonics = []
+    # N = len(signal)
+
+    # print(fund)
+
+    """
+    flux = spectral_flux(signal)
+    m_indx = np.argmax(flux)
+    print(m_indx)
+    # find a good "chunk" to work on
+
+    test = 0
+    for i in range(m_indx, len(flux) - m_indx):
+        if flux[i] < flux[m_indx] / 5:
+            test += 1
+            # print(i, " has ", flux[i])
+            if test == 16:  # find a 1-second long portion
+                break       # with little flux
+    # print("start at:", i - 16 + 1)
+
+    start = int(i * SR / 16)
+    end = int(start + SR / 4)
+    """
+
+    fund = fundamental(signal)
+    num_harmonics = min(8, int( 22050 / fund) )
+
+    start = int( SR / 4 )
+    end = int( start + SR / 4 )
+
+    # get the spectrum, and start working on
+    # getting the harmonic information
+    spectrum = fft.rfft( hann_window( signal[start:end] ) )
+    L = len(spectrum)
+
+    f = fundamental( signal[start : end] )
+
+    # f_indx = int( (f * 2 * L) / SR )
+    # harmonics.append( abs(spectrum[f_indx]) )
+
+    for i in range(1, num_harmonics + 1):
+        f_indx = int( f * i * 2 * L / SR)
+
+        r = abs( spectrum[f_indx] )
+        for j in range(f_indx - 10, f_indx + 20):
+            if abs( spectrum[j] ) > r:
+                r = abs( spectrum[j] )
+
+        harmonics.append( r )
+
+    t = harmonics[0]
+    for i in range(len(harmonics)):
+        harmonics[i] = harmonics[i] / t
+
+
+    return harmonics
 
 
 def spectral_centroid(spectrum):
@@ -145,9 +203,20 @@ def hann_window(signal):
     return windowed_signal
 
 def main():
-    f = au.read_wav_mono('audio_files/guitar_A4_very-long_forte_normal.wav')
-    s = spectral_flux(f)
-    print(s)
+    print("guitar")
+    f = au.read_wav_mono('audio_files/guitar/guitar_A4_very-long_forte_normal.wav')
+    h = harmonic_representation(f)
+    print(np.array(h))
+
+    print("saxophone")
+    f = au.read_wav_mono('audio_files/saxophone/saxophone_A4_15_forte_normal.wav')
+    h = harmonic_representation(f)
+    print(np.array(h))
+
+    print("violin")
+    f = au.read_wav_mono('audio_files/violin/violin_A4_1_mezzo-piano_arco-normal.wav')
+    h = harmonic_representation(f)
+    print(np.array(h))
 
 if __name__ == '__main__':
     main()
