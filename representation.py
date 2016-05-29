@@ -41,6 +41,9 @@ def get_harmonic_representations():
             print(i, end = ' ')
         print(' ')
 
+def get_zcrs():
+    
+
 def main():
     get_harmonic_representations()
 

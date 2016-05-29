@@ -75,8 +75,17 @@ def trim_silence(signal):
         end = start + step
     return (signal[ signal_begin : signal_end ], centroids)
 
+def zero_crossing_rate(signal):
+    n = 0
+    for i in range(1, len(signal)):
+        if (signal[i] * signal[i - 1]) < 0: # if there is a zero crossing
+            n += 1
+    n = n / len(signal)
+    return n
+
 def fundamental(signal):
     s = fft.rfft(signal)
+
     """
     N = len(s)
     print("number of bins:", N)
@@ -112,7 +121,7 @@ def harmonic_representation(signal):
     L = len(spectrum)
 
     f = fundamental( signal[start : end] )
-    print(fund, f)
+    # print(fund, f)
 
     # f_indx = int( (f * 2 * L) / SR )
     # harmonics.append( abs(spectrum[f_indx]) )
@@ -154,31 +163,6 @@ def spectral_centroid(spectrum):
     centroid = centroid / d
     return centroid
 
-def spectral_flux(signal):
-    l = len(signal)
-    if l < (SR / 2):
-        print("Warning: very short signal")
-    # divide the signal up into chunks
-    step = int(SR / 16)
-    start = 0
-    end = start + step
-    old_spectrum = [0] * (int(step / 2) + 1)
-    spectralFlux = []
-    while end < l:
-        chunk = signal[start:end]
-        new_spectrum = fft.rfft(chunk)
-        spectralFlux.append(euclidean_distance(old_spectrum, new_spectrum))
-        old_spectrum = list(new_spectrum)
-        # print( "Old: ", id(old_spectrum), "New: ", id(new_spectrum) )
-        start = end
-        end = start + step
-    return spectralFlux
-
-def cepstrum(signal):
-    spectrum = fft.rfft(signal)
-    cepstrum = np.fft.ifft(np.log(np.abs(spectrum))).real
-    return cepstrum
-
 def spectral_mean(signal):
     return np.sum(np.absolute(signal))/len(signal)
 
@@ -197,12 +181,24 @@ def hann_window(signal):
     return windowed_signal
 
 def main():
-
+    """
     f = au.read_wav_mono('audio_files/saxophone/saxophone_A5_15_fortissimo_normal.wav')
 
     h = harmonic_representation(f)
     print(np.array(h))
+    """
 
+    fnames = open('filenames.txt', 'r')
+    for line in fnames:
+        line = line.strip()
+        if 'guitar' in line:
+            print("guitar", end = ' ')
+        if 'saxophone' in line:
+            print("saxophone", end = ' ')
+        if 'violin' in line:
+            print("violin", end = ' ')
+        f = au.read_wav_mono(line)
+        print(zero_crossing_rate(f))
 
 if __name__ == '__main__':
     main()
