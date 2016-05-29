@@ -41,6 +41,7 @@ def set_hidden_units(layer, new_hidden):
     if layer == layers:
         print("No hidden units at this layer")
     else:
+        bias[layer-1] = np.random.rand(new_hidden)
         weights[layer-1] = np.random.rand(new_hidden, weights[layer-1].shape[1])
         weights[layer] = np.random.rand(weights[layer].shape[1], new_hidden)
     return weights
@@ -52,30 +53,39 @@ def update_weights(input, output, eta):
     # not sure exactly how the looping while work, but will come back to this
     # and figure it out
     for i in range(input.shape[1]):
-        activation = []
-        weight = []
-        bias = []
-        x0 = input[:, [i]]
-        for j in range(layers):
-            if i == 0:
-                activation.append(propagate(x0, weights[0], bias[0], logistic))
-            else:
-                activation.append(propagate(activation[j-0], weights[j], bias[j], logistic))
-        activations.append(activation)
-        for k in range(layers, -1, -1):
-            d_list = []
-            if k == len(layers):
-                d_list.append(derror(output[:, [i]], activations[i][k]) * dlogistic(x2))
-                weights[k] += eta * np.dot(d_list[len(layers) - k], activations[i][k-1].T)
-                bias[k]+= eta * d_list[len(layers) - k].sum(axis=1)
-            else:
-                d_list.append(np.dot(d_list[len(layers) - k - 1].T, weights[k-1]).T * dlogistic(activations[i][k-1]))
-                weights[k] += eta * np.dot(d_list[len(layers) - k], activations[i][k-1].T)
-                db0 = eta * d_list[len(layers) - k](axis=1)
-
+        d_list = []
+        # activation = []
+        # activation.append(input[:, [i]])
+        # for j in range(layers):
+            # activation.append(propagate(activation[j], weights[j], bias[j], logistic))
+        activation = forward_propagation(input[:, [i]], logistic)
+        for k in range(layers-1, -1, -1):
+            if k == layers-1:
+                d_list.append(derror(output[:, [i]], activation[k+1]) * d_logistic(activation[k+1]))
+                weights[k] += eta * np.dot(d_list[layers - 1 - k], activation[k].T)
+                bias[k]+= eta * d_list[layers -1 - k].sum(axis=1)
                 
+            else:
+                d_list.append(np.dot(d_list[layers - k - 2].T, weights[k+1]).T * d_logistic(activation[k+1]))
+                weights[k] += eta * np.dot(d_list[layers - 1 - k], activation[k].T)
+                bias[k] += eta * d_list[layers - 1 - k].sum(axis=1)
+
+def forward_propagation(input, weight_fn):
+    activation = []
+    activation.append(input)
+    for j in range(layers):
+        activation.append(propagate(activation[j], weights[j], bias[j], weight_fn))
+    print(activation)
+    return activation    
 def train_network(input, output, weight_function, num_iters, eta):
     for i in range(num_iters):
-        weight_function(input, output, weights, bias, eta)
+        print("Iteration: ", i)
+        weight_function(input, output, eta)
     return weights, bias
-                
+
+def predict_network(input, weight_function):
+    print(forward_propagation(input, weight_function))
+    return forward_propagation(input, weight_function)[layers]
+
+def get_weights():
+    return weights
