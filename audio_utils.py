@@ -92,6 +92,18 @@ def read_raw_stereo(filename):
         i = (i+1)%2
     return left, right
 
+
+def return_start_end(signal):
+    N = 44100/4
+    start = 0
+    while abs(signal[start]) < 50:
+        start += 1
+    
+    if start + N > len(signal):
+        return (-1, -1)
+    else:
+        return (start, start + N)
+    
 def create_sine_wave(freq, amp, dur):
     dur *= SR
     wave = []
