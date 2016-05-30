@@ -75,11 +75,11 @@ def forward_propagation(input, weight_fn):
     activation.append(input)
     for j in range(layers):
         activation.append(propagate(activation[j], weights[j], bias[j], weight_fn))
-    print(activation)
     return activation    
 def train_network(input, output, weight_function, num_iters, eta):
     for i in range(num_iters):
         print("Iteration: ", i)
+        print(weights[layers-1])
         weight_function(input, output, eta)
     return weights, bias
 
