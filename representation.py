@@ -74,12 +74,15 @@ def get_zcrs():
         outfile.close()
 
 def get_centroids():
-        instrs = ["guitar", "clarinet", "flute", "saxophone", "violin"]
-        lens = [106, 846, 878, 732, 1502]
+        # instrs = ["guitar", "clarinet", "flute", "saxophone", "violin"]
+        # lens = [106, 846, 878, 732, 1502]
+        instrs = ["clarinet", "flute", "saxophone", "violin"]
+        lens = [846, 878, 732, 1502]
         for instr in instrs:
             print(instr)
             fnames = open("audio_files/" + instr + ".txt", 'r')
             outfile = open("reps/" + instr + "_centroid.txt", 'w')
+            log = open("log.txt", 'w')
             i = 0
             l = sum(1 for line in fnames)
             fnames.seek(0)
@@ -91,20 +94,22 @@ def get_centroids():
                 (start, end) = au.get_good_chunk(wave)
                 if start > 0:
                     s = fft.rfft(wave[start:end])
-                    c = ap.get_spectral_centroid(s)
+                    c = ap.spectral_centroid(s)
                     outfile.write(str(c) + '\n')
                     p = int( i * 100 / l )
                     if p > p0:
                         print(str(p) + "% done with " + instr, end = '\r')
                         p0 = p
                     # print(p)
+                else:
+                    log.write("skipped " + line + '\n')
                 i += 1
             print("all ")
             fnames.close()
             outfile.close()
 
 def main():
-    get_zcrs()
+    get_centroids()
 
 
 if __name__ == '__main__':
