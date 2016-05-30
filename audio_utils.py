@@ -76,6 +76,7 @@ def read_wav_mono(filename):
         # which is the format of our wav files
         val = struct.unpack("<h", f.readframes(1))[0]
         out.append(val)
+    # wave.close()
     return out
 
 
@@ -92,18 +93,16 @@ def read_raw_stereo(filename):
         i = (i+1)%2
     return left, right
 
-
-def return_start_end(signal):
+def get_good_chunk(signal):
     N = 44100/4
     start = 0
     while abs(signal[start]) < 50:
         start += 1
-    
-    if start + N > len(signal):
+
+    if start + N - 1 >= len(signal):
         return (-1, -1)
-    else:
-        return (start, start + N)
-    
+    return ( int(start) , int(start + N) )
+
 def create_sine_wave(freq, amp, dur):
     dur *= SR
     wave = []

@@ -4,6 +4,7 @@
 
 import audio_utils as au
 import audio_processing as ap
+import numpy.fft as fft
 
 def load_audio_files():
     filenames = open('filenames.txt', 'r')
@@ -42,10 +43,69 @@ def get_harmonic_representations():
         print(' ')
 
 def get_zcrs():
-    
+    # instrs = ["guitar", "clarinet", "flute", "saxophone", "violin"]
+    # lens = [106, 846, 878, 733, 1502]
+    instrs = ["saxophone", "violin"]
+    lens = [732, 1502]
+    for instr in instrs:
+        print(instr)
+        fnames = open("audio_files/" + instr + ".txt", 'r')
+        outfile = open("reps/temp_" + instr + "_zcr.txt", 'w')
+        i = 0
+        l = sum(1 for line in fnames)
+        fnames.seek(0)
+        print(l)
+        p0 = -1
+        for line in fnames:
+            line = line.strip()
+            wave = au.read_wav_mono(line)
+            (start, end) = au.get_good_chunk(wave)
+            if start > 0:
+                zcr = ap.zero_crossing_rate(wave[start:end])
+                outfile.write(str(zcr) + '\n')
+                p = int( i * 100 / l )
+                if p > p0:
+                    print(str(p) + "% done with " + instr, end = '\r')
+                    p0 = p
+                # print(p)
+            i += 1
+        print("all ")
+        fnames.close()
+        outfile.close()
+
+def get_centroids():
+        instrs = ["guitar", "clarinet", "flute", "saxophone", "violin"]
+        lens = [106, 846, 878, 732, 1502]
+        for instr in instrs:
+            print(instr)
+            fnames = open("audio_files/" + instr + ".txt", 'r')
+            outfile = open("reps/" + instr + "_centroid.txt", 'w')
+            i = 0
+            l = sum(1 for line in fnames)
+            fnames.seek(0)
+            print(l)
+            p0 = -1
+            for line in fnames:
+                line = line.strip()
+                wave = au.read_wav_mono(line)
+                (start, end) = au.get_good_chunk(wave)
+                if start > 0:
+                    s = fft.rfft(wave[start:end])
+                    c = ap.get_spectral_centroid(s)
+                    outfile.write(str(c) + '\n')
+                    p = int( i * 100 / l )
+                    if p > p0:
+                        print(str(p) + "% done with " + instr, end = '\r')
+                        p0 = p
+                    # print(p)
+                i += 1
+            print("all ")
+            fnames.close()
+            outfile.close()
 
 def main():
-    get_harmonic_representations()
+    get_zcrs()
+
 
 if __name__ == '__main__':
     main()
