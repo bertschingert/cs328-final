@@ -4,4 +4,4 @@ tmp*
 *cache*
 ._.DS_Store
 audio_files/
-reps/*ratios.txt
+*.tgz
