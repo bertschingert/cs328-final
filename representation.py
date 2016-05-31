@@ -108,8 +108,44 @@ def get_centroids():
             fnames.close()
             outfile.close()
 
+def get_reps():
+            instrs = ["clarinet", "flute", "saxophone", "violin"]
+            lens = [846, 878, 732, 1502]
+            for instr in instrs:
+                print(instr)
+                fnames = open("audio_files/" + instr + ".txt", 'r')
+                out_zcr= open("tmpreps/" + instr + "_zcr.txt", 'w')
+                out_cen= open("tmpreps/" + instr + "_centroid.txt", 'w')
+                out_rat= open("tmpreps/" + instr + "_ratio.txt", 'w')
+                # log = open("log.txt", 'w')
+                i = 0
+                l = sum(1 for line in fnames)
+                fnames.seek(0)
+                print(l)
+                p0 = -1
+                for line in fnames:
+                    wave = au.read_wav_mono(line.strip())
+                    s = fft.rfft(wave)
+                    c = ap.spectral_centroid(s)
+                    out_cen.write(str(c) + '\n')
+                    zcr = ap.zero_crossing_rate(wave)
+                    out_zcr.write(str(zcr) + '\n')
+                    rat = c / zcr
+                    out_rat.write(str(rat) + '\n')
+                    p = int( i * 100 / l )
+                    if p > p0:
+                        print(str(p) + "% done with " + instr, end = '\r')
+                        p0 = p
+                    # print(p)
+                    i += 1
+                print("all ")
+                fnames.close()
+                out_zcr.close()
+                out_cen.close()
+                out_rat.close()
+
 def main():
-    get_centroids()
+    get_reps()
 
 
 if __name__ == '__main__':
