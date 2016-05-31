@@ -10,6 +10,8 @@ def d_logistic(x):
 def propagate(inp, w, b, f):
     return f(np.dot(w, inp) + b[:, None])
 
+#+ b[:, None]
+
 def error(target, computed):
     return 0.5 * (target - computed) ** 2
 
@@ -52,39 +54,44 @@ def update_weights(input, output, eta):
     new_biases = []
     # not sure exactly how the looping while work, but will come back to this
     # and figure it out
+    #print(input.shape[1])
     for i in range(input.shape[1]):
         d_list = []
         # activation = []
         # activation.append(input[:, [i]])
         # for j in range(layers):
             # activation.append(propagate(activation[j], weights[j], bias[j], logistic))
+        print("Input: ", input[:, [i]])
         activation = forward_propagation(input[:, [i]], logistic)
         for k in range(layers-1, -1, -1):
             if k == layers-1:
                 d_list.append(derror(output[:, [i]], activation[k+1]) * d_logistic(activation[k+1]))
                 weights[k] += eta * np.dot(d_list[layers - 1 - k], activation[k].T)
+                print("New weights at layer ", str(k), weights[k])
                 bias[k]+= eta * d_list[layers -1 - k].sum(axis=1)
                 
             else:
                 d_list.append(np.dot(d_list[layers - k - 2].T, weights[k+1]).T * d_logistic(activation[k+1]))
                 weights[k] += eta * np.dot(d_list[layers - 1 - k], activation[k].T)
+                print("New weights at layer ", str(k), weights[k])
                 bias[k] += eta * d_list[layers - 1 - k].sum(axis=1)
 
 def forward_propagation(input, weight_fn):
     activation = []
     activation.append(input)
     for j in range(layers):
+        print("activation at layer: ", str(j+1), propagate(activation[j], weights[j], bias[j], weight_fn))
         activation.append(propagate(activation[j], weights[j], bias[j], weight_fn))
     return activation    
+
 def train_network(input, output, weight_function, num_iters, eta):
     for i in range(num_iters):
         print("Iteration: ", i)
-        print(weights[layers-1])
         weight_function(input, output, eta)
     return weights, bias
 
 def predict_network(input, weight_function):
-    print(forward_propagation(input, weight_function))
+    #print(forward_propagation(input, weight_function))
     return forward_propagation(input, weight_function)[layers]
 
 def get_weights():
