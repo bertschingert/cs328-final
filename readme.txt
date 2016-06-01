@@ -17,4 +17,14 @@ Our code is organized into several modules:
 
 We stored several audio files in an archive "audio_files.tgz"; because all the
 files together are several hundred megabytes, we did not upload every file.
-However, the representation information for all 3411 audio files is included. 
+
+To test creating representations:
+  1) extract the audio files from "audio_files.tgz"
+  2) run the file "representation.py". The main
+     function in representation.py will compute
+     the representations for the included audio files.
+  3) The representations will be stored in text files
+     in the directory "example_reps/"
+
+The representation information for all 3411 audio files is included
+in the directory "reps/"
