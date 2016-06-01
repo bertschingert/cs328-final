@@ -18,22 +18,25 @@ def error(target, computed):
 def derror(target, computed):
     return target - computed
 
-def initialize_network(inp_length, outp_length, num_layers, num_hidden):
+def initialize_network(inp, outp_length, num_layers, num_hidden):
     global layers 
     layers = num_layers
     global weights
     global bias
     global input_length
-    input_length = inp_length
+    input_length = len(inp)
     global output_length
     output_length = outp_length
     weights = []
     bias = []
-    weights.append(np.random.randn(num_hidden, input_length))
+    firstlayer_weights = []
+    for i in inp:
+        firstlayer_weights.append(np.random.randn(3, inp.shape[0]))
+    weights.ap
     bias.append(np.random.randn(num_hidden))
     if layers > 2:
         for i in range(layers-2):
-            weights.append(np.random.randn(num_hidden, num_hidden))
+            weights.append(np.random.randn(num_hidden, 3*input_length))
             bias.append(np.random.randn(num_hidden))
     weights.append(np.random.randn(output_length, num_hidden))
     bias.append(np.random.randn(outp_length))
