@@ -135,8 +135,7 @@ def get_example_reps():
     in order to avoid overwriting the directory reps/
                                     (which contains the essential info)
     """
-    instrs = ["guitar", "clarinet", "flute", "saxophone", "violin"]
-    lens = [71, 770, 781, 621, 901]
+
     fnames = open("example_audio_filenames.txt", 'r')
     outzcr = open("example_reps/zcr.txt", 'w')
     outcen = open("example_reps/centroid.txt", 'w')
@@ -166,6 +165,8 @@ def get_example_reps():
     outflu.close()
 
     fnames.close()
+
+    print("stored representations in the directory \'example_reps/\'")
 
 def main():
     print("representation.py")
