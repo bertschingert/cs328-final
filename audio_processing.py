@@ -93,7 +93,7 @@ def harmonic_representation(signal):
 
     # get the spectrum, and start working on
     # getting the harmonic information
-    s = fft.rfft( ap.hann_window(signal) )
+    s = fft.rfft( hann_window(signal) )
     L = len(s)
     m = np.argmax(s)
     harmonics.append( abs(s[m]) )
