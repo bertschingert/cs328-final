@@ -1,4 +1,5 @@
 import numpy as np
+import audio_utils as au
 import math
 
 np.random.seed(123)
@@ -90,6 +91,36 @@ def main():
     print("neural_net.py")
     print("This file contains the functions to train a neural network")
     print("and to test the network on novel stimuli.")
+    answer = input("Run a test computation of the neural net? y/n ")
+    if answer == 'y' or answer == 'Y':
+        f_data = []
+        instrs = ["guitar", "clarinet", "flute", "saxophone", "violin"]
+        for instr in instrs:
+            f_data.append(au.fetch_nflux_rep(instr))
+
+        f_inp = []
+        f_outputs = []
+        print("creating training data...")
+        for i in range(50):
+            for j in range(5):
+                f_output = [0]*5
+                f_output[j] = 1
+                f_outputs.append(f_output)
+                f_inp.append(np.array(f_data[j][i]))
+
+        f_inp = np.array(f_inp)
+        f_out = np.array(f_outputs)
+
+        initialize_network(f_inp.T.shape[0], f_out.T.shape[0], 3, 5)
+        set_hidden_units(1, 10)
+        print("training the network")
+        train_network(f_inp.T, f_out.T, update_weights, 300, 0.01)
+        print("**************************")
+        print("predicting the network:")
+        real = predict_network(f_inp.T, logistic)
+        cm = au.confusion_matrix(real.T, f_out, f_out.T.shape[0])
+        print(cm)
+        au.print_cc_info(cm, 50, instrs)
 
 if __name__ == '__main__':
     main()
