@@ -13,9 +13,13 @@ SR = 44100
 SP = 1 / SR
 
 def euclidean_distance(a, b):
+    """
+    used for spectral flux
+    gets the euclidean distance between two vectors
+    """
     d = 0
-    if len(a) != len(b):
-        print("Warning: vectors are of different sizes")
+    # if len(a) != len(b):
+        # print("Warning: vectors are of different sizes")
     l = min(len(a), len(b))
     for i in range(l):
         d += ( abs(a[i]) - abs(b[i]) )**2
@@ -47,35 +51,12 @@ def attack_time(signal, f_s):
         end = start + step
     return 0
 
-# THIS FUNCTION IS IN ROUGH DRAFT MODE RIGHT NOW
-def trim_silence(signal):
-    """
-    * trims leading and trailing silence from the signal
-    * to make further processing easier
-    """
-    signal_begin = -1    # will be first relevant sample
-    signal_end = -1      # will be last relevant sample
-
-    l = len(signal)
-    step = int(SR / 200) # consider 50 ms chunks
-    start = 0
-    end = start + step
-    centroids = []
-    while end < l:
-        chunk = signal[start:end]
-        spectrum = fft.rfft(chunk)
-        c = spectral_centroid(spectrum)
-        centroids.append(c)
-        if c > 200 and signal_begin < 0:
-            signal_begin = start
-        if c < 200 and signal_begin >= 0:
-            signal_end = end
-
-        start = end
-        end = start + step
-    return (signal[ signal_begin : signal_end ], centroids)
-
 def zero_crossing_rate(signal):
+    """
+    Computes the zero crossing rate of the signal
+    which is the number of sign changes
+    divided by the total number of samples
+    """
     n = 0
     for i in range(1, len(signal)):
         if (signal[i] * signal[i - 1]) < 0: # if there is a zero crossing
@@ -84,58 +65,45 @@ def zero_crossing_rate(signal):
     return n
 
 def fundamental(signal):
+    """
+    Gets the fundamental frequency
+    which is the strongest frequency present in the signal
+    """
     s = fft.rfft(signal)
 
-    """
-    N = len(s)
-    print("number of bins:", N)
-
-    hz = 1000
-    step = int (2 * hz * N / SR)
-    start = 0
-    end = start + step
-
-    while end < N:
-        m = np.argmax(s[start:end]) + start
-        f = m * SR / (2 * N)
-        print(f)
-        start = end
-        end += step
-    """
     m = np.argmax(s)
     f = m * SR / (2 * len(s))
     return f
 
 def harmonic_representation(signal):
+    """
+    gets a harmonic representation of the signal
+    first gets the fundamental frequency
+    and then gets the amount of energy in integer multiples
+    of the fundamental (considers 8 harmonics)
+    and then normalizes these with respect to the fundamental
+    """
     harmonics = []
 
     fund = fundamental(signal)
-    num_harmonics = min(8, int( 22050 / fund) )
-
-    start = int( SR / 4 )
-    end = int( start + SR / 4 )
+    num_harmonics = 8
 
     # get the spectrum, and start working on
     # getting the harmonic information
-    spectrum = fft.rfft( hann_window( signal[start:end] ) )
-    L = len(spectrum)
+    s = fft.rfft( ap.hann_window(signal) )
+    L = len(s)
+    m = np.argmax(s)
+    harmonics.append( abs(s[m]) )
 
-    f = fundamental( signal[start : end] )
-    # print(fund, f)
-
-    # f_indx = int( (f * 2 * L) / SR )
-    # harmonics.append( abs(spectrum[f_indx]) )
-
-    for i in range(1, num_harmonics + 1):
-        f_indx = int( f * i * 2 * L / SR)
-        print("now on ", f_indx)
-
-        r = abs( spectrum[f_indx] )
-        for j in range(f_indx - 10, f_indx + 20):
-            if abs( spectrum[j] ) > r:
-                r = abs( spectrum[j] )
-
-        harmonics.append( r )
+    for i in range(2, num_harmonics + 1):
+        c = m * i
+        if c < L:
+            b = max(0, c - 50)
+            e = min(c + 50, L - 1)
+            m0 = np.argmax(s[b:e])
+            harmonics.append( abs(s[m0]) )
+        else:
+            harmonics.append( 0 )
 
     t = harmonics[0]
     for i in range(len(harmonics)):
@@ -143,13 +111,12 @@ def harmonic_representation(signal):
 
     return harmonics
 
-def spectral_centroid(spectrum):
+def spectral_centroid(signal):
     """
     * computes the spectral centroid
     * which is the weighted mean of the spectrum
-    * spectrum : the output of the FFT of a signal
-    * f_s : sample rate
     """
+    spectrum = fft.rfft(signal)
     l = len(spectrum)
     centroid = 0
     d = 0
@@ -163,8 +130,26 @@ def spectral_centroid(spectrum):
     centroid = centroid / d
     return centroid
 
-def spectral_mean(signal):
-    return np.sum(np.absolute(signal))/len(signal)
+def spectral_flux(signal):
+    """
+    divide the signal into 16 chunks and compute the flux
+    which is the amount of change in the spectrum
+    from one frame to the next
+    """
+    flux = []
+    step = int(len(signal) / 16)
+    start = 0
+    end = start + step
+    old_spectrum = [0] * (int(step / 2) + 1)
+    for i in range(16):
+        new_spectrum = fft.rfft(signal[start:end])
+        d = euclidean_distance(old_spectrum, new_spectrum)
+        flux.append(d)
+        old_spectrum = list(new_spectrum)
+        start = end
+        end = min(start + step, len(signal) - 1)
+
+    return flux
 
 def hann_window(signal):
     """
