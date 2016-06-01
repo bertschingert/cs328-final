@@ -46,4 +46,11 @@ reps/ is organized into the following types of files:
   7) [instr]_zcr.txt
       zero-crossing rate
 and corresponding lines of each of these files (for the same instrument)
-all refer to the same audio file
+all refer to the same audio file.
+
+To test the prototype model, run prototype.py. The main function will
+provide an example computation.
+
+To test the neural network, run neural_net.py. The main function will
+compute an example; more in-depth examples (with graphs of data) can be
+found in the notebooks. 
