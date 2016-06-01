@@ -79,20 +79,6 @@ def read_wav_mono(filename):
     # wave.close()
     return out
 
-
-def read_raw_stereo(filename):
-    raw_file = open(filename)
-    left = []
-    right = []
-    i = 0
-    for line in raw_file:
-        if i%2 == 0:
-            left.append(line)
-        else:
-            right.append(line)
-        i = (i+1)%2
-    return left, right
-
 def get_good_chunk(signal):
     N = 44100/4
     start = 0
@@ -103,6 +89,7 @@ def get_good_chunk(signal):
         return (-1, -1)
     return ( int(start) , int(start + N) )
 
+
 def create_sine_wave(freq, amp, dur):
     dur *= SR
     wave = []
@@ -110,11 +97,66 @@ def create_sine_wave(freq, amp, dur):
         wave.append(amp * math.sin(i*freq*2*math.pi*SP))
     return wave
 
-# this function is currently NON-FUNCTIONAL
-def create_saw_wave(freq, amp, dur):
-    dur *= SR
-    period = SR / freq
-    wave = []
-    for i in range(dur):
-        wave.append((i%period) / period)
-    return wave
+def fetch_harmonic_rep(instr):
+    h = []
+    if instr not in ["guitar", "clarinet", "flute", "saxophone", "violin"]:
+        print("invalid instrument")
+        return ["nope"]
+    infile = open("reps/" + instr + "_harmonics.txt", 'r')
+    for line in infile:
+        ex = []
+        for i in line.split(','):
+            ex.append( float(i.strip()) )
+        h.append(ex)
+    infile.close()
+    return h
+
+def fetch_flux_rep(instr):
+    h = []
+    if instr not in ["guitar", "clarinet", "flute", "saxophone", "violin"]:
+        print("invalid instrument")
+        return ["nope"]
+    infile = open("reps/" + instr + "_flux.txt", 'r')
+    for line in infile:
+        ex = []
+        for i in line.split(','):
+            ex.append( float(i.strip()) )
+        h.append(ex)
+    infile.close()
+    return h
+
+def fetch_nflux_rep(instr):
+    h = []
+    if instr not in ["guitar", "clarinet", "flute", "saxophone", "violin"]:
+        print("invalid instrument")
+        return ["nope"]
+    infile = open("reps/" + instr + "_nflux.txt", 'r')
+    for line in infile:
+        ex = []
+        for i in line.split(','):
+            ex.append( float(i.strip()) )
+        h.append(ex)
+    infile.close()
+    return h
+
+def fetch_centroid_rep(instr):
+    h = []
+    if instr not in ["guitar", "clarinet", "flute", "saxophone", "violin"]:
+        print("invalid instrument")
+        return ["nope"]
+    infile = open("reps/" + instr + "_centroid.txt", 'r')
+    for line in infile:
+        h.append( float(line.strip()) )
+    infile.close()
+    return h
+
+def fetch_zcr_rep(instr):
+    h = []
+    if instr not in ["guitar", "clarinet", "flute", "saxophone", "violin"]:
+        print("invalid instrument")
+        return ["nope"]
+    infile = open("reps/" + instr + "_zcr.txt", 'r')
+    for line in infile:
+        h.append( float(line.strip()) )
+    infile.close()
+    return h
