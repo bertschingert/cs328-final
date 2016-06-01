@@ -9,7 +9,7 @@ Our code is organized into several modules:
                          such as spectral centroid, spectral flux, etc.
     representation     : used to loop through every audio file and use the functions
                          in audio_processing to create representations, and then
-                         stores these in text files in the directory 'reps/'
+                         stores these in text files in the directory "reps/"
     prototype          : functions to classify signals based on their representations
                          using prototype models
     neural_net         : functions to classify signals based on their representations
