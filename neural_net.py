@@ -19,7 +19,7 @@ def derror(target, computed):
     return target - computed
 
 def initialize_network(inp_length, outp_length, num_layers, num_hidden):
-    global layers 
+    global layers
     layers = num_layers
     global weights
     global bias
@@ -38,7 +38,7 @@ def initialize_network(inp_length, outp_length, num_layers, num_hidden):
     weights.append(np.random.randn(output_length, num_hidden))
     bias.append(np.random.randn(outp_length))
     return weights
-    
+
 def set_hidden_units(layer, new_hidden):
     if layer == layers:
         print("No hidden units at this layer")
@@ -60,7 +60,7 @@ def update_weights(inp, output, eta):
                 d_list.append(derror(output[:, [i]], activation[k+1]) * d_logistic(activation[k+1]))
                 weights[k] += eta * np.dot(d_list[layers - 1 - k], activation[k].T)
                 bias[k]+= eta * d_list[layers -1 - k].sum(axis=1)
-                
+
             else:
                 d_list.append(np.dot(d_list[layers - k - 2].T, weights[k+1]).T * d_logistic(activation[k+1]))
                 weights[k] += eta * np.dot(d_list[layers - 1 - k], activation[k].T)
@@ -71,16 +71,25 @@ def forward_propagation(inp, weight_fn):
     activation.append(inp)
     for j in range(layers):
         activation.append(propagate(activation[j], weights[j], bias[j], weight_fn))
-    return activation    
+    return activation
 
 def train_network(inp, output, weight_function, num_iters, eta):
     for i in range(num_iters):
-        print("Iteration: ", i)
+        if i%10 == 0:
+            print("Iteration:", i)
         weight_function(inp, output, eta)
     return weights, bias
 
-def predict_network(inp, weight_function): 
+def predict_network(inp, weight_function):
     return forward_propagation(inp, weight_function)[layers]
 
 def get_weights():
     return weights
+
+def main():
+    print("neural_net.py")
+    print("This file contains the functions to train a neural network")
+    print("and to test the network on novel stimuli.")
+
+if __name__ == '__main__':
+    main()

@@ -68,11 +68,9 @@ def create_prototype(stimuli):
     return prototype
 
 def main():
-    s1 = [0, 0, 0]
-    s2 = [2, 4, 8]
-    s3 = [999, -888, 3]
-    p = create_prototype([s1, s2, s3])
-    print(p)
+    print("prototype.py")
+    print("This file contains functions to create prototypes")
+    print("and uses them to predict novel stimuli.")
 
 if __name__ == '__main__':
     main()

@@ -47,7 +47,10 @@ def get_reps():
         out_flu.close()
 
 def main():
-    get_reps()
+    print("representation.py")
+    print("This file contains the function to get the representations")
+    print("for each of our 3411 audio files. It stores this information")
+    print("in text files in the directory \'reps/\'.")
 
 if __name__ == '__main__':
     main()
