@@ -9,8 +9,11 @@ import numpy.fft as fft
 import audio_utils as au
 import numpy as np
 
+"""
+throughout our project, the sample rate
+is always 44100 hz 
+"""
 SR = 44100
-SP = 1 / SR
 
 def euclidean_distance(a, b):
     """
