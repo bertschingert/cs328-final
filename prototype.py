@@ -9,18 +9,45 @@ def distance(a, b):
     b_ratio = b[1]/b[0]
     return abs(a_ratio - b_ratio)/1000
 
-def shepard_similarity(a, b):
-    return math.exp(-distance(a,b))
+def euclid_d(a, b):
+    d = 0
+    for i in range(len(a)):
+        d += (a[i] - b[i])**2
+    return math.sqrt(d)
 
-def prototype_model(test_stimuli, prototypes):
+def predict(example, prototypes):
+    ds = []
+    for p in prototypes:
+        ds.append(euclid_d(example, p))
+    return np.argmin(ds)
+
+def shepard_similarity(a, b, distance_fn):
+    return math.exp(-distance_fn(a,b))
+
+def prototype_model(test_stimuli, prototypes, distance_fn):
     proto_probs = []
     for i in test_stimuli:
         probs = []
         for j in prototypes:
-            num = shepard_similarity(j, i)
+            num = shepard_similarity(j, i, distance_fn)
             den = 0
             for k in prototypes:
-                den += shepard_similarity(k, i)
+                #print(shepard_similarity(k, i, distance_fn))
+                den += shepard_similarity(k, i, distance_fn)
+            probs.append(num/den)
+        proto_probs.append(probs)
+    return proto_probs
+
+def euclid_d_prototype_model(test_stimuli, prototypes, distance_fn):
+    proto_probs = []
+    for i in test_stimuli:
+        probs = []
+        for j in prototypes:
+            num = shepard_similarity(j, i, distance_fn)
+            den = 0
+            for k in prototypes:
+                #print(shepard_similarity(k, i, distance_fn))
+                den += distance_fn(k, i)
             probs.append(num/den)
         proto_probs.append(probs)
     return proto_probs

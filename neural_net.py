@@ -43,9 +43,9 @@ def set_hidden_units(layer, new_hidden):
     if layer == layers:
         print("No hidden units at this layer")
     else:
-        bias[layer-1] = np.random.rand(new_hidden)
-        weights[layer-1] = np.random.rand(new_hidden, weights[layer-1].shape[1])
-        weights[layer] = np.random.rand(weights[layer].shape[1], new_hidden)
+        bias[layer-1] = np.random.randn(new_hidden)
+        weights[layer-1] = np.random.randn(new_hidden, weights[layer-1].shape[1])
+        weights[layer] = np.random.randn(weights[layer].shape[1], new_hidden)
     return weights
 
 def update_weights(inp, output, eta):

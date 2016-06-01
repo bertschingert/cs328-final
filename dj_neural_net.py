@@ -32,7 +32,7 @@ def initialize_network(inp, outp_length, num_layers, num_hidden):
     firstlayer_weights = []
     for i in inp:
         firstlayer_weights.append(np.random.randn(3, inp.shape[0]))
-    weights.ap
+    weights.append(firstlayer_weights)
     bias.append(np.random.randn(num_hidden))
     if layers > 2:
         for i in range(layers-2):
@@ -73,6 +73,9 @@ def forward_propagation(inp, weight_fn):
     activation = []
     activation.append(inp)
     for j in range(layers):
+        if j = 0:
+            for i in 
+            activation.append(propagate(activation[j], weights[j], bias[j], weight_fn))
         activation.append(propagate(activation[j], weights[j], bias[j], weight_fn))
     return activation    
 
