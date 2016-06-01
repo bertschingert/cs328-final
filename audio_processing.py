@@ -163,8 +163,56 @@ def spectral_centroid(spectrum):
     centroid = centroid / d
     return centroid
 
+def harmonic_representation(signal):
+    harmonics = []
+
+    fund = fundamental(signal)
+    num_harmonics = 8
+
+    # get the spectrum, and start working on
+    # getting the harmonic information
+    s = fft.rfft( ap.hann_window(signal) )
+    L = len(s)
+    m = np.argmax(s)
+    harmonics.append( abs(s[m]) )
+
+    for i in range(2, num_harmonics + 1):
+        c = m * i
+        if c < L:
+            b = max(0, c - 50)
+            e = min(c + 50, L - 1)
+            m0 = np.argmax(s[b:e])
+            harmonics.append( abs(s[m0]) )
+        else:
+            harmonics.append( 0 )
+
+    t = harmonics[0]
+    for i in range(len(harmonics)):
+        harmonics[i] = harmonics[i] / t
+
+    return harmonics
+
 def spectral_mean(signal):
     return np.sum(np.absolute(signal))/len(signal)
+
+def spectral_flux(signal):
+    """
+    divide the signal into 16 chunks and compute the flux
+    """
+    flux = []
+    step = int(len(signal) / 16)
+    start = 0
+    end = start + step
+    old_spectrum = [0] * (int(step / 2) + 1)
+    for i in range(16):
+        new_spectrum = fft.rfft(signal[start:end])
+        d = euclidean_distance(old_spectrum, new_spectrum)
+        flux.append(d)
+        old_spectrum = list(new_spectrum)
+        start = end
+        end = min(start + step, len(signal) - 1)
+
+    return flux
 
 def hann_window(signal):
     """
