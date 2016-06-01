@@ -7,6 +7,7 @@ import math
 import wave
 import struct
 import matplotlib.pyplot as plt
+import numpy as np
 
 SR = 44100      # sapmle rate (assumed to be 44100 always)
 SP = 1 / SR     # sample period
@@ -160,3 +161,29 @@ def fetch_zcr_rep(instr):
         h.append( float(line.strip()) )
     infile.close()
     return h
+
+def confusion_matrix (actual, desired, outp_length):
+    """Gets confusion matrix for a networks output."""
+    confusion = np.zeros((outp_length, outp_length))
+    for indx in range(len(actual)):
+        # print(desired[indx])
+        i = desired[indx].tolist().index(1)
+        # print(actual[indx])
+        j = actual[indx].argmax()
+        confusion[i][j] += 1
+    return confusion
+
+def print_cc_info(cc, data_length, categories):
+    sum1, sum2 = 0, 0
+    class_list = []
+    for i in range(len(cc)):
+        for j in range(len(cc[i])):
+            if j == i:
+                sum1 += cc[i][j]
+                class_list.append(cc[i][j])
+            sum2 += cc[i][j]
+    print("This NN got correct ", sum1, " out of ", sum2, " tests")
+    print("which is ", str(sum1/sum2)[:5])
+    for i in range(len(categories)):
+        print("For", categories[i], ", This NN classified", class_list[i], " out of ", data_length)
+        print("which is ", str(class_list[i]/data_length)[:5])
