@@ -1,4 +1,5 @@
 import numpy as np
+import audio_utils as au
 import math
 
 def prototype(v1, v2):
@@ -67,10 +68,77 @@ def create_prototype(stimuli):
 
     return prototype
 
+def prediction(probs, instrs):
+    predict_list = []
+    for i in probs:
+        predict_list.append(instrs[np.argmax(i)])
+    return predict_list
+
+def frequency(predict_list, desired):
+    sum = 0
+    for i in predict_list:
+        if i == desired:
+            sum += 1
+    return sum
+
+def freq_list(predict_list, instrs):
+    list = [0]*len(instrs)
+    for i in range(len(instrs)):
+        for j in predict_list:
+            if j == instrs[i]:
+                list[i] += 1
+    return list
+
+def confusion_matrix (probs_list, instrs, outp_length):
+    """Gets confusion matrix for a networks output."""
+    confusion = np.zeros((outp_length, outp_length))
+    for indx in range(len(probs_list)):
+        # print(desired[indx])
+        i = indx
+        # print(actual[indx])
+        #print(probs_list[indx])
+        for k in probs_list[indx]:
+            j = np.argmax(k)
+            confusion[i][j] += 1
+    return confusion
+
+def print_cc_info(cc, data_length, categories):
+    sum1, sum2 = 0, 0
+    class_list = []
+    for i in range(len(cc)):
+        for j in range(len(cc[i])):
+            if j == i:
+                sum1 += cc[i][j]
+                class_list.append(cc[i][j])
+            sum2 += cc[i][j]
+    print("This model got correct ", sum1, " out of ", sum2, " tests")
+    print("which is ", str(sum1/sum2)[:5])
+    print(categories)
+    for i in range(len(categories)):
+        print("For", categories[i], ", This model classified", class_list[i], " out of ", data_length)
+        print("which is ", str(class_list[i]/data_length)[:5])
+
 def main():
     print("prototype.py")
     print("This file contains functions to create prototypes")
     print("and uses them to predict novel stimuli.")
+    answer = input("Run an example of the prototype model? y/n ")
+    if answer == 'y' or answer == 'Y':
+        h_data = []
+        instrs = ["guitar", "clarinet", "flute", "saxophone", "violin"]
+        ind = 0
+        for instr in instrs:
+            h_data.append(au.fetch_harmonic_rep(instr))
+
+        proto_list = []
+        for i in h_data:
+            proto_list.append(create_prototype(i[:50])) # use the first 50 examples to create the prototype
+        probs_list = []
+        for h in h_data:
+            probs_list.append(prototype_model(h[50:], proto_list, euclid_d)) # use the rest as testing
+
+        cm = confusion_matrix(probs_list, instrs, 5)
+        print_cc_info(cm, len(h[50:]), instrs)
 
 if __name__ == '__main__':
     main()
