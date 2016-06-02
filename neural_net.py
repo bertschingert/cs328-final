@@ -1,4 +1,5 @@
 import numpy as np
+import audio_utils as au
 import math
 
 np.random.seed(123)
@@ -19,7 +20,7 @@ def derror(target, computed):
     return target - computed
 
 def initialize_network(inp_length, outp_length, num_layers, num_hidden):
-    global layers 
+    global layers
     layers = num_layers
     global weights
     global bias
@@ -38,7 +39,7 @@ def initialize_network(inp_length, outp_length, num_layers, num_hidden):
     weights.append(np.random.randn(output_length, num_hidden))
     bias.append(np.random.randn(outp_length))
     return weights
-    
+
 def set_hidden_units(layer, new_hidden):
     if layer == layers:
         print("No hidden units at this layer")
@@ -60,7 +61,7 @@ def update_weights(inp, output, eta):
                 d_list.append(derror(output[:, [i]], activation[k+1]) * d_logistic(activation[k+1]))
                 weights[k] += eta * np.dot(d_list[layers - 1 - k], activation[k].T)
                 bias[k]+= eta * d_list[layers -1 - k].sum(axis=1)
-                
+
             else:
                 d_list.append(np.dot(d_list[layers - k - 2].T, weights[k+1]).T * d_logistic(activation[k+1]))
                 weights[k] += eta * np.dot(d_list[layers - 1 - k], activation[k].T)
@@ -71,16 +72,55 @@ def forward_propagation(inp, weight_fn):
     activation.append(inp)
     for j in range(layers):
         activation.append(propagate(activation[j], weights[j], bias[j], weight_fn))
-    return activation    
+    return activation
 
 def train_network(inp, output, weight_function, num_iters, eta):
     for i in range(num_iters):
-        print("Iteration: ", i)
+        if i%10 == 0:
+            print("Iteration:", i)
         weight_function(inp, output, eta)
     return weights, bias
 
-def predict_network(inp, weight_function): 
+def predict_network(inp, weight_function):
     return forward_propagation(inp, weight_function)[layers]
 
 def get_weights():
     return weights
+
+def main():
+    print("neural_net.py")
+    print("This file contains the functions to train a neural network")
+    print("and to test the network on novel stimuli.")
+    answer = input("Run a test computation of the neural net? y/n ")
+    if answer == 'y' or answer == 'Y':
+        f_data = []
+        instrs = ["guitar", "clarinet", "flute", "saxophone", "violin"]
+        for instr in instrs:
+            f_data.append(au.fetch_nflux_rep(instr))
+
+        f_inp = []
+        f_outputs = []
+        print("creating training data...")
+        for i in range(50):
+            for j in range(5):
+                f_output = [0]*5
+                f_output[j] = 1
+                f_outputs.append(f_output)
+                f_inp.append(np.array(f_data[j][i]))
+
+        f_inp = np.array(f_inp)
+        f_out = np.array(f_outputs)
+
+        initialize_network(f_inp.T.shape[0], f_out.T.shape[0], 3, 5)
+        set_hidden_units(1, 10)
+        print("training the network")
+        train_network(f_inp.T, f_out.T, update_weights, 300, 0.01)
+        print("**************************")
+        print("predicting the network:")
+        real = predict_network(f_inp.T, logistic)
+        cm = au.confusion_matrix(real.T, f_out, f_out.T.shape[0])
+        print(cm)
+        au.print_cc_info(cm, 50, instrs)
+
+if __name__ == '__main__':
+    main()

@@ -28,3 +28,29 @@ To test creating representations:
 
 The representation information for all 3411 audio files is included
 in the directory "reps/"
+
+reps/ is organized into the following types of files:
+      [instr] \in {clarinet, flute, guitar, saxophone, violin}
+  1) [instr]_centroid.txt
+      spectral centroid
+  2) [instr]_flux.txt
+      spectral flux
+  3) [instr]_funds.txt
+      fundamental frequencies
+  4) [instr]_harmonics.txt
+      harmonic representations
+  5) [instr]_nflux.txt
+      normalized spectral flux
+  6) [instr]_ratio.txt
+      ratio of spectral centroid to zero-crossing rate
+  7) [instr]_zcr.txt
+      zero-crossing rate
+and corresponding lines of each of these files (for the same instrument)
+all refer to the same audio file.
+
+To test the prototype model, run prototype.py. The main function will
+provide an example computation.
+
+To test the neural network, run neural_net.py. The main function will
+compute an example; more in-depth examples (with graphs of data) can be
+found in the notebooks. 

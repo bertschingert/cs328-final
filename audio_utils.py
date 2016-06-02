@@ -187,3 +187,10 @@ def print_cc_info(cc, data_length, categories):
     for i in range(len(categories)):
         print("For", categories[i], ", This NN classified", class_list[i], " out of ", data_length)
         print("which is ", str(class_list[i]/data_length)[:5])
+
+def main():
+    print("audio_utils.py")
+    print("This file contains various utility functions. ")
+
+if __name__ == '__main__':
+    main()

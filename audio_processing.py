@@ -11,7 +11,7 @@ import numpy as np
 
 """
 throughout our project, the sample rate
-is always 44100 hz 
+is always 44100 hz
 """
 SR = 44100
 
@@ -93,7 +93,7 @@ def harmonic_representation(signal):
 
     # get the spectrum, and start working on
     # getting the harmonic information
-    s = fft.rfft( ap.hann_window(signal) )
+    s = fft.rfft( hann_window(signal) )
     L = len(s)
     m = np.argmax(s)
     harmonics.append( abs(s[m]) )
@@ -169,24 +169,13 @@ def hann_window(signal):
     return windowed_signal
 
 def main():
-    """
-    f = au.read_wav_mono('audio_files/saxophone/saxophone_A5_15_fortissimo_normal.wav')
-
-    h = harmonic_representation(f)
-    print(np.array(h))
-    """
-
-    fnames = open('filenames.txt', 'r')
-    for line in fnames:
-        line = line.strip()
-        if 'guitar' in line:
-            print("guitar", end = ' ')
-        if 'saxophone' in line:
-            print("saxophone", end = ' ')
-        if 'violin' in line:
-            print("violin", end = ' ')
-        f = au.read_wav_mono(line)
-        print(zero_crossing_rate(f))
+    print("audio_processing.py")
+    print("This file contains functions that compute various audio features.")
+    wave = au.read_wav_mono('audio_files/clarinet_A3_1_forte_normal.wav')
+    c = spectral_centroid(wave)
+    print("For example, the spectral centroid of")
+    print('audio_files/clarinet_A3_1_forte_normal.wav')
+    print("is", c)
 
 if __name__ == '__main__':
     main()
